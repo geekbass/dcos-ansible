@@ -22,10 +22,10 @@ pip install ansible==2.6.2 mazer
 ## Usage
 1) Install Roles
 ```
-mazer install --content-path $PWD dcos.dcos_ansible
+mazer install --content-path $PWD/ansible dcos.dcos_ansible
 ```
 
-This will install the roles in `dcos/dcos_ansible`. See tree below:
+This will install the roles in `./anisble/dcos/dcos_ansible`. See tree below:
 
 ```
 tree dcos/dcos_ansible/
@@ -156,7 +156,7 @@ dcos/dcos_ansible/
 
 2) Drop a `license.txt` with your EE license key. (Note if you are install OSS, Remove the reference from the main.tf)
 
-3) Modify the `main.tf` to your liking such as Number of Masters, Agents, AMI, Cluster Name, SSH Key, etc...
+3) Modify the `main.tf` to your liking such as Number of Masters, Agents, AMI, Cluster Name, SSH Key, etc... If EE, Copy your license key in place of current value for `license_key_contents`. *Currently when you specify `${file(./license.txt)}` with your contents in the file, the local_file resource places a `\n` at the end causing the yaml syntax to fail.* 
 
 4) Auth, Init, Plan and Apply Terraform.
 ```
@@ -166,13 +166,14 @@ terraform plan -out plan.out
 terraform apply plan.out
 ```
 
-Terraform will handle creation of the `inventory` and vars files for DC/OS (`group_vars/all/dcos.yml`).
+Terraform will handle creation of the `inventory` and vars files for DC/OS (`group_vars/all/dcos.yml`) in the `ansible/dcos/dcos_ansible` directory.
 
 5) Once the infrastructure completes, you can run the Roles (Hint You will likely need to set `host_key_checking` to `False` in the ansible.cfg):
 ```
-cd dcos/dcos_ansible
+cd ansible/dcos/dcos_ansible
 ansible-playbook dcos.yml
 ```
+PRO TIP: You can set `host_key_checking` to `False` in the `ansible.cfg` if you would like to skip being prompted the initial run.  
 
 This will take some time to complete.
 

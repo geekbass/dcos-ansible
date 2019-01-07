@@ -11,7 +11,7 @@ variable "aws_ami" {
 
 variable "cluster_name" {
   description = "Name of your DC/OS Cluster"
-  default     = "ansible-wes"
+  default     = "dcosansible"
 }
 
 variable "num_masters" {
@@ -34,12 +34,19 @@ variable "ssh_public_key_file" {
   default     = "~/.ssh/id_rsa.pub"
 }
 
+# Adding Radom string for Cluster Name for testing purposes
+resource "random_string" "dcos_cluster_name" {
+  length  = 4
+  special = false
+  upper   = false
+}
+
 # Begin Modules
 module "dcos-infrastructure" {
   source              = "dcos-terraform/infrastructure/aws"
   admin_ips           = ["${data.http.whatismyip.body}/32"]
   aws_ami             = "${var.aws_ami}"
-  cluster_name        = "${var.cluster_name}"
+  cluster_name        = "${var.cluster_name}${random_string.dcos_cluster_name.result}"
   num_masters         = "${var.num_masters}"
   num_private_agents  = "${var.num_private_agents}"
   num_public_agents   = "${var.num_public_agents}"
@@ -49,8 +56,6 @@ module "dcos-infrastructure" {
     owner      = "wbassler"
     expiration = "4h"
   }
-
-
 }
 
 # Begin Outputs
@@ -104,7 +109,7 @@ locals {
 
 # Build the vars file
 resource "local_file" "vars_file" {
-  filename = "./dcos/dcos_ansible/group_vars/all/dcos.yml"
+  filename = "./ansible/dcos/dcos_ansible/group_vars/all/dcos.yml"
 
   content = <<EOF
 ---
@@ -129,7 +134,7 @@ EOF
 
 
 resource "local_file" "ansible_inventory" {
-  filename = "./dcos/dcos_ansible/inventory"
+  filename = "./ansible/dcos/dcos_ansible/inventory"
 
   content = <<EOF
 [bootstraps]
