@@ -156,7 +156,7 @@ dcos/dcos_ansible/
 
 2) Drop a `license.txt` with your EE license key. (Note if you are install OSS, Remove the reference from the main.tf)
 
-3) Modify the `main.tf` to your liking such as Number of Masters, Agents, AMI, Cluster Name, SSH Key, etc... If EE, Copy your license key in place of current value for `license_key_contents`. *Currently when you specify `${file(./license.txt)}` with your contents in the file, the local_file resource places a `\n` at the end causing the yaml syntax to fail.* 
+3) Modify the `main.tf` to your liking such as Number of Masters, Agents, AMI, Cluster Name, SSH Key, etc...  
 
 4) Auth, Init, Plan and Apply Terraform.
 ```

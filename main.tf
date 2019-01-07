@@ -117,7 +117,7 @@ dcos:
   download: "https://downloads.mesosphere.com/dcos-enterprise/stable/commit/20fa047bbd37188ccb55f61ab9590edc809030ec/dcos_generate_config.ee.sh"
   version: "1.12.0"
   version_to_upgrade_from: "1.12.0"
-  enterprise_dcos: false
+  enterprise_dcos: true
   selinux_mode: enforcing
 
   config:
@@ -128,7 +128,7 @@ dcos:
     master_discovery: static
     master_list:
       - ${local.masters_ansible_private_ips}
-    license_key_contents: "${file("./license.txt")}"
+    license_key_contents: "${trimspace(file("./license.txt"))}"
 EOF
 }
 
