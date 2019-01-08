@@ -6,12 +6,17 @@ data "http" "whatismyip" {
 # Begin Variables 
 variable "aws_ami" {
   description = "AMI to use"
-  default     = "ami-4bf3d731"
+  default     = "ami-0394fe9914b475c53"
 }
 
 variable "cluster_name" {
   description = "Name of your DC/OS Cluster"
-  default     = "dcosansible"
+  default     = "dcos-broadridge"
+}
+
+variable "bootstrap_instance_type" {
+  description = "[BOOTSTRAP] Instance type"
+  default     = "c5.large"
 }
 
 variable "num_masters" {
@@ -19,42 +24,56 @@ variable "num_masters" {
   default     = "3"
 }
 
+variable "masters_instance_type" {
+  description = "[MASTERS] Instance type"
+  default     = "m4.xlarge"
+}
+
 variable "num_private_agents" {
   description = "Number of Private Agents"
-  default     = "3"
+  default     = "10"
+}
+
+variable "private_agents_instance_type" {
+  description = "[PRIVATE AGENTS] Instance type"
+  default     = "c5.2xlarge"
 }
 
 variable "num_public_agents" {
   description = "Number of Public Agents"
-  default     = "1"
+  default     = "3"
+}
+
+variable "public_agents_instance_type" {
+  description = "[PUBLIC AGENTS] Instance type"
+  default     = "c5.2xlarge"
 }
 
 variable "ssh_public_key_file" {
   description = "SSH Key Location"
-  default     = "~/.ssh/id_rsa.pub"
+  default     = "~/.ssh/id_broadridge.pub"
 }
 
-# Adding Radom string for Cluster Name for testing purposes
-resource "random_string" "dcos_cluster_name" {
-  length  = 4
-  special = false
-  upper   = false
-}
 
 # Begin Modules
 module "dcos-infrastructure" {
   source              = "dcos-terraform/infrastructure/aws"
   admin_ips           = ["${data.http.whatismyip.body}/32"]
   aws_ami             = "${var.aws_ami}"
-  cluster_name        = "${var.cluster_name}${random_string.dcos_cluster_name.result}"
+  cluster_name        = "${var.cluster_name}"
   num_masters         = "${var.num_masters}"
   num_private_agents  = "${var.num_private_agents}"
   num_public_agents   = "${var.num_public_agents}"
   ssh_public_key_file = "${var.ssh_public_key_file}"
 
+  bootstrap_instance_type = "${var.bootstrap_instance_type}"
+  masters_instance_type   = "${var.masters_instance_type}"
+  private_agents_instance_type = "${var.private_agents_instance_type}"
+  public_agents_instance_type  = "${var.public_agents_instance_type}" 
+
   tags = {
-    owner      = "wbassler"
-    expiration = "4h"
+    owner      = "dmennell"
+    expiration = "never"
   }
 }
 
@@ -114,9 +133,9 @@ resource "local_file" "vars_file" {
   content = <<EOF
 ---
 dcos:
-  download: "https://downloads.mesosphere.com/dcos-enterprise/stable/commit/20fa047bbd37188ccb55f61ab9590edc809030ec/dcos_generate_config.ee.sh"
-  version: "1.12.0"
-  version_to_upgrade_from: "1.12.0"
+  download: "http://downloads.mesosphere.com/dcos-enterprise/stable/1.12.1/dcos_generate_config.ee.sh"
+  version: "1.12.1"
+  version_to_upgrade_from: "1.12.1"
   enterprise_dcos: true
   selinux_mode: enforcing
 
