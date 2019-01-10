@@ -137,7 +137,7 @@ dcos:
   version: "1.12.1"
   version_to_upgrade_from: "1.12.1"
   enterprise_dcos: true
-  selinux_mode: enforcing
+  selinux_mode: permissive
 
   config:
     cluster_name: "${var.cluster_name}"
